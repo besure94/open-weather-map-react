@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import SearchForm from './SearchForm';
-import getWeather from '../api-call/weather-api-call';
+import { getWeather } from '../api-call/weather-api-call';
 
 function WeatherForecast() {
   const [error, setError] = useState(null);
@@ -12,19 +12,34 @@ function WeatherForecast() {
   useEffect(() => {
     async function getWeatherApiData() {
       setError(null);
-      const result = await getWeather(city);
-      if (result instanceof Error) {
-        setError(result.message);
+      try {
+        const response = await getWeather(city);
+        setWeatherForecast(response.list);
+        setIsLoaded(true);
+      } catch (error) {
+        setError(error.message);
         setIsLoaded(false);
-        return;
       }
-      setWeatherForecast(result.list);
-      setIsLoaded(true);
     }
 
     if (city) {
       getWeatherApiData(city);
     }
+    // async function getWeatherApiData() {
+    //   setError(null);
+    //   const result = await getWeather(city);
+    //   if (result instanceof Error) {
+    //     setError(result.message);
+    //     setIsLoaded(false);
+    //     return;
+    //   }
+    //   setWeatherForecast(result.list);
+    //   setIsLoaded(true);
+    // }
+
+    // if (city) {
+    //   getWeatherApiData(city);
+    // }
   }, [city]);
 
   const handleFormSubmission = (formInput) => {
